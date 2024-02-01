@@ -63,6 +63,7 @@ def generate_idea(state):
     state.idea = response.choices[0].message.content
 
 
+
 # Variables
 idea = ""
 prompt = ""
@@ -71,12 +72,6 @@ n_requests = 0
 app_type = "Spreadsheet"
 target_user = "Students"
 improvement = "Timely"
-
-
-def on_exception(state, function_name: str, ex: Exception):
-    logging.error(f"Problem {ex} \nin {function_name}")
-    notify(state, 'error', f"Problem {ex} \nin {function_name}")
-
 
 page = """
 <|container|
