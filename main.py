@@ -1,41 +1,23 @@
 # Import from standard library
-import logging
-import random
-import re
-import os,sys
+import os
+import sys
 import numpy as np
 import openai
 
 from taipy.gui import Gui, notify
 
-client = None
-
-link_words=['Create a ',' for ', ' that helps the user to be more ', ' using these hints: ']
-APP_TYPE =['Game','Spreadsheet','Editor','Ticketing','Entertainment','News','Movies','Room booking','Reservation','To-do list','Money tracking','Reminder','Music','Recipe','Accouting','Trading','Law','Inventory','Human Resources','Procurement']
-TARGET_USER=['Business','Students','Academic','Personal','Team','Elderly','Youth','Middle-age']
-IMPROVEMENT =['Decisive','Efficent','Timely','Innovative','Creative','Diversify']
-
-MADE_OF= ['Metal','Wood','Plastic','Edible','Paper','Organic']
-POWER_BY=['Manual', 'Electric', 'Clockwork', 'Solar', 'Wind', 'Water']
-OF_SIZE=['Giant', 'Mini', 'Pocket', 'Portable', 'Wearable', 'Inhabitable']
-RUN_ON = ['Robot', 'Vehicle', 'Computer', 'Game', 'Tool', 'Art']
-#USED_BY=['Family', 'Personal', 'Office', 'Home', 'Industrial', 'Public']
-BY_MEANS=['Flying', 'Random', 'Self-Build', 'Underwater', 'Stealth', 'Disposable']
-
-list_of_hints=[POWER_BY,OF_SIZE,RUN_ON,BY_MEANS]
 
 
-
-# generate idea based on user select + random selection of hints
 def generate_idea(state):
+    """ generate idea based on user selection plus random selection of hints """
     state.idea = ""
-    hints=[]
-    for i in range(len(list_of_hints)):
-        j=np.random.randint(len(list_of_hints[i]))
-        hints.append(list_of_hints[i][j])
+    hints = []
+    for i, one_list  in enumerate(list_of_hints):
+        j = np.random.randint(len(one_list))
+        hints.append(one_list[j])
 
-    hints_str=' '.join(hints)
-                     
+    hints_str = ' '.join(hints)
+
     if state.app_type == "":
         notify(state, "error", "Please select an application type")
         return
@@ -47,8 +29,9 @@ def generate_idea(state):
         return
 
     state.prompt = (
-        f"Generate a web application idea using these keywords :'{state.app_type} {state.target_user}  {state.improvement}  "
-        f"  {hints_str}'.  Use less than 700 characters to describe. \n\n\n\n"
+        f"Generate a web application idea using these keywords :\
+        '{state.app_type} {state.target_user}  {state.improvement}  "\
+        f"  {hints_str}'.  Use less than 1000 characters to describe. \n\n\n\n"
     )
     print(state.prompt)
     response = state.client.chat.completions.create(
@@ -63,11 +46,31 @@ def generate_idea(state):
     state.idea = response.choices[0].message.content
 
 
+link_words = ['Create a ', ' for ',
+              ' that helps the user to be more ', ' using these hints: ']
+APP_TYPE = ['Game', 'Spreadsheet', 'Editor', 'Ticketing', 'Entertainment', 'News',\
+             'Movies', 'Room booking', 'Reservation', 'To-do list','Money tracking',\
+             'Reminder', 'Music', 'Recipe', 'Accouting', 'Trading', 'Law', 'Inventory',\
+             'Human Resources', 'Procurement']
+TARGET_USER = ['Business', 'Students', 'Academic',
+               'Personal', 'Team', 'Elderly', 'Youth', 'Middle-age']
+IMPROVEMENT = ['Decisive', 'Efficent', 'Timely',
+               'Innovative', 'Creative', 'Diversify']
+
+MADE_OF = ['Metal', 'Wood', 'Plastic', 'Edible', 'Paper', 'Organic']
+POWER_BY = ['Manual', 'Electric', 'Clockwork', 'Solar', 'Wind', 'Water']
+OF_SIZE = ['Giant', 'Mini', 'Pocket', 'Portable', 'Wearable', 'Inhabitable']
+RUN_ON = ['Robot', 'Vehicle', 'Computer', 'Game', 'Tool', 'Art']
+# USED_BY=['Family', 'Personal', 'Office', 'Home', 'Industrial', 'Public']
+BY_MEANS = ['Flying', 'Random', 'Self-Build',
+            'Underwater', 'Stealth', 'Disposable']
+
+list_of_hints = [POWER_BY, OF_SIZE, RUN_ON, BY_MEANS]
+client = None
 
 # Variables
 idea = ""
 prompt = ""
-n_requests = 0
 
 app_type = "Spreadsheet"
 target_user = "Students"
@@ -132,4 +135,3 @@ if __name__ == "__main__":
 
     client = openai.Client(api_key=api_key)
     Gui(page).run(title='Idea Generation')
-
